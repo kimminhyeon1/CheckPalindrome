@@ -1,0 +1,155 @@
+﻿#include <stdio.h>
+#include <stdlib.h>
+
+#define MAX_QUEUE_SIZE 100
+#define MAX_STACK_SIZE 100
+
+typedef int element;
+typedef struct {
+	element data[MAX_QUEUE_SIZE];
+	int front, rear;
+}QueueType;
+typedef struct {
+	int data[MAX_STACK_SIZE];
+	int top;
+}StackType;
+
+void error(char* message) {
+	fprintf(stderr, "%s\n", message);
+	exit(1);
+}
+
+void init_queue(QueueType* q) {
+	q->front = q->rear = 0;
+}
+
+int is_empty_queue(QueueType* q) {
+	return (q->front == q->rear);
+}
+
+int is_full_queue(QueueType* q) {
+	return((q->rear + 1) % MAX_QUEUE_SIZE == q->front);
+}
+
+void enqueue(QueueType* q, element item) {
+	if (is_full_queue(q)) {
+		error("큐가 포화상태입니다.\n");
+	}
+	else {
+		q->rear = (q->rear + 1) % MAX_QUEUE_SIZE;
+		q->data[q->rear] = item;
+	}
+}
+
+element dequeue(QueueType* q) {
+	if (is_empty_queue(q)) {
+		error("큐가 공백상태입니다.\n");
+	}
+	else {
+		q->front = (q->front + 1) % MAX_QUEUE_SIZE;
+		return q->data[q->front];
+	}
+}
+
+element peek(QueueType* q) {
+	if (is_empty_queue(q)) {
+		error("Queue is empty\n");
+	}
+	else {
+		return q->data[(q->front + 1) % MAX_QUEUE_SIZE];
+	}
+}
+
+void queue_print(QueueType* q) {
+	int i;
+	printf("-----------------------------\n");
+	printf("현재 큐의 상태: ");
+	if (is_empty_queue(q)) {
+		error("큐가 비어있습니다.");
+	}
+	else {
+		for (i = (q->front + 1) % MAX_QUEUE_SIZE; i != q->rear; i = (i + 1) % MAX_QUEUE_SIZE) {
+			printf("%2d ", q->data[i]);
+		}
+		printf("%2d\n", q->data[i]);
+	}
+	printf("-----------------------------\n");
+}
+
+void init_stack(StackType* s) {
+	s->top = -1;
+}
+
+int is_empty_stack(StackType* s) {
+	return(s->top == -1);
+}
+
+int is_full_stack(StackType* s) {
+	return (s->top == (MAX_STACK_SIZE - 1));
+}
+
+void push(StackType* s, element item) {
+	if (is_full_stack(s)) {
+		fprintf(stderr, "스택 포화 에러\n");
+		return;
+	}
+	else s->data[++(s->top)] = item;
+}
+
+element pop(StackType* s) {
+	if (is_empty_stack(s)) {
+		fprintf(stderr, "스택 공백 에러\n");
+		return -1;
+	}
+	else return s->data[(s->top)--];
+}
+
+
+int main(void) {
+	char str[MAX_QUEUE_SIZE];
+	int choice;
+	int a, b;
+	int count = 0;
+
+	QueueType queue;
+	StackType stack;
+
+	while (1) {
+		printf("1. 회문 입력\n");
+		printf("2. 회문 검사\n");
+		printf("3. 종료\n");
+		printf("메뉴 선택: ");
+		scanf_s("%d", &choice);
+		while (getchar() != '\n');
+
+		switch (choice) {
+		case 1:
+			printf("회문을 입력하세요: ");
+			scanf_s("%[^\n]s", &str);
+			break;
+		case 2:
+			
+			enqueue(&queue, str);
+			push(&stack, str);
+			for (int i = 0; i < MAX_QUEUE_SIZE; i++) {
+				a = dequeue(&queue);
+				b = pop(&stack);
+				if (a != b) {
+					count += 1;
+				}
+			}
+			if (count == 0) {
+				printf("회문입니다.\n");
+			}
+			else {
+				printf("회문이 아닙니다.\n");
+			}
+			break;
+		case 3:
+			exit(0);
+		default:
+			printf("잘못된 메뉴 선택\n");
+			break;
+		}
+	}
+}
