@@ -1,16 +1,20 @@
-﻿#include <stdio.h>
+﻿#define _CRT_SECURE_NO_WARNINGS
+#include <stdio.h>
 #include <stdlib.h>
+#include <ctype.h>
+
 
 #define MAX_QUEUE_SIZE 100
 #define MAX_STACK_SIZE 100
 
-typedef int element;
+typedef char element;
 typedef struct {
 	element data[MAX_QUEUE_SIZE];
 	int front, rear;
 }QueueType;
+
 typedef struct {
-	int data[MAX_STACK_SIZE];
+	char data[MAX_STACK_SIZE];
 	int top;
 }StackType;
 
@@ -51,15 +55,6 @@ element dequeue(QueueType* q) {
 	}
 }
 
-element peek(QueueType* q) {
-	if (is_empty_queue(q)) {
-		error("Queue is empty\n");
-	}
-	else {
-		return q->data[(q->front + 1) % MAX_QUEUE_SIZE];
-	}
-}
-
 void queue_print(QueueType* q) {
 	int i;
 	printf("-----------------------------\n");
@@ -93,7 +88,10 @@ void push(StackType* s, element item) {
 		fprintf(stderr, "스택 포화 에러\n");
 		return;
 	}
-	else s->data[++(s->top)] = item;
+	else {
+		s->top += 1;
+		s->data[s->top] = item;
+	}
 }
 
 element pop(StackType* s) {
@@ -106,43 +104,50 @@ element pop(StackType* s) {
 
 
 int main(void) {
-	char str[MAX_QUEUE_SIZE];
-	int choice;
-	int a, b;
-	int count = 0;
+	char str1[MAX_QUEUE_SIZE];
+	char str2[MAX_QUEUE_SIZE];
 
 	QueueType queue;
 	StackType stack;
 
 	while (1) {
+		int choice = 0;
+		int k = 0;
+		int found = 0;
 		printf("1. 회문 입력\n");
 		printf("2. 회문 검사\n");
 		printf("3. 종료\n");
 		printf("메뉴 선택: ");
-		scanf_s("%d", &choice);
+		scanf("%d", &choice);
 		while (getchar() != '\n');
 
 		switch (choice) {
 		case 1:
 			printf("회문을 입력하세요: ");
-			scanf_s("%[^\n]s", &str);
-			break;
-		case 2:
-			
-			enqueue(&queue, str);
-			push(&stack, str);
-			for (int i = 0; i < MAX_QUEUE_SIZE; i++) {
-				a = dequeue(&queue);
-				b = pop(&stack);
-				if (a != b) {
-					count += 1;
+			scanf("%[^\n]s", &str1);
+			for (int i = 0; str1[i] != '\0'; i++) {
+				if (str1[i] != ' ' && str1[i] != '!' && str1[i] != ',' && str1[i] != '?' && str1[i] != '\'' && str1[i] != '.' && str1[i] != '\"') {
+					str2[k++] = str1[i];
 				}
 			}
-			if (count == 0) {
-				printf("회문입니다.\n");
+			str2[k] = '\0';
+			break;
+		case 2:
+			init_queue(&queue);
+			init_stack(&stack);
+			for (int i = 0; str2[i] != '\0'; i++) {
+				enqueue(&queue, tolower(str2[i]));
+				push(&stack, tolower(str2[i]));
 			}
-			else {
-				printf("회문이 아닙니다.\n");
+			while (!is_empty_queue(&queue)) {
+				if (dequeue(&queue) != pop(&stack)) {
+					printf("회문이 아닙니다.\n");
+					found++;
+					break;
+				}
+			}
+			if (found == 0) {
+				printf("회문입니다.\n");
 			}
 			break;
 		case 3:

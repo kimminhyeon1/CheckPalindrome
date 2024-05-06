@@ -24,6 +24,7 @@
     <ProjectGuid>{1cb05a98-29c6-4f59-a33e-8cfb9cb0664f}</ProjectGuid>
     <RootNamespace>PCsimulation</RootNamespace>
     <WindowsTargetPlatformVersion>10.0</WindowsTargetPlatformVersion>
+    <ProjectName>CheckPalindrome</ProjectName>
   </PropertyGroup>
   <Import Project="$(VCTargetsPath)\Microsoft.Cpp.Default.props" />
   <PropertyGroup Condition="'$(Configuration)|$(Platform)'=='Debug|Win32'" Label="Configuration">
